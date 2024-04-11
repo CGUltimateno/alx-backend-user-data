@@ -35,8 +35,9 @@ def filter_datum(fields: List[str], redaction: str, message: str, separator: str
         returns the log message obfuscated
         """
     for field in fields:
-        message = re.sub(rf'{field}=.*?{separator}',
-                         f'{field}={redaction}{separator}', message)
+        message = re.sub(f"{field}=.+?{separator}",
+                         f"{field}={redaction}{separator}",
+                         message)
     return message
 
 
@@ -78,17 +79,23 @@ def main():
         obtain a database connection using get_db
         and retrieve all rows in the users table
         """
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM users")
-    for row in cursor:
-        print(row)
-        fields = ""
-        for i in range(len(row)):
-            fields += f"{PII_FIELDS[i]}={row[i]};"
-        print(fields)
-    cursor.close()
-    db.close()
+    columns = ["name", "email", "phone", "ssn",
+               "password", "ip", "last_login", "user_agent"]
+    logger = get_logger()
+
+    with get_db() as db:
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM users;")
+        for row in cursor:
+            ___msg = ""
+            ___col_index = 0
+            for col in row:
+                ___msg += f"{columns[___col_index]}={col}; "
+                ___col_index += 1
+            __msg = ___msg.strip()
+            logger.info(___msg)
+        cursor.close()
+        db.close()
 
 
 if __name__ == "__main__":
