@@ -4,8 +4,10 @@
 """
 import os
 import re
-from typing import List, Tuple
 import logging
+from datetime import datetime
+import os
+from typing import List, Tuple
 import mysql.connector
 
 
@@ -17,9 +19,10 @@ class RedactingFormatter(logging.Formatter):
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
     SEPARATOR = ";"
 
-    def __init__(self, fields: List[str] = []):
+    def __init__(self, fields: List[str]):
+        """ constructor"""
         super(RedactingFormatter, self).__init__(self.FORMAT)
-        self.fields = fields
+        self._fields = fields
 
     def format(self, record: logging.LogRecord) -> str:
         """
@@ -30,7 +33,8 @@ class RedactingFormatter(logging.Formatter):
         return super().format(record)
 
 
-def filter_datum(fields: List[str], redaction: str, message: str, separator: str) -> str:
+def filter_datum(fields: List[str], redaction: str,
+                 message: str, separator: str) -> str:
     """
         returns the log message obfuscated
         """
@@ -57,7 +61,7 @@ def get_logger() -> logging.Logger:
     return logger
 
 
-def get_db() -> List[Tuple[str, str, str]]:
+def get_db() -> mysql.connector.connection.MySQLConnection:
     """
         returns a list of tuples
         """
@@ -67,14 +71,14 @@ def get_db() -> List[Tuple[str, str, str]]:
     db = os.getenv("PERSONAL_DATA_DB_NAME")
 
     return (mysql.connector.connect(
-        host=host,
-        database=db,
-        user=username,
-        password=password)
-    )
+            host=host,
+            database=db,
+            user=username,
+            password=password)
+            )
 
 
-def main():
+def main() -> None:
     """
         obtain a database connection using get_db
         and retrieve all rows in the users table
@@ -83,19 +87,17 @@ def main():
                "password", "ip", "last_login", "user_agent"]
     logger = get_logger()
 
-    with get_db() as db:
-        cursor = db.cursor()
-        cursor.execute("SELECT * FROM users;")
-        for row in cursor:
-            ___msg = ""
-            ___col_index = 0
-            for col in row:
-                ___msg += f"{columns[___col_index]}={col}; "
-                ___col_index += 1
-            __msg = ___msg.strip()
-            logger.info(___msg)
-        cursor.close()
-        db.close()
+    with get_db() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM users;")
+            for row in cursor:
+                ___msg = ""
+                ___col_index = 0
+                for col in row:
+                    ___msg += f"{columns[___col_index]}={col}; "
+                    ___col_index += 1
+                __msg = ___msg.strip()
+                logger.info(___msg)
 
 
 if __name__ == "__main__":
