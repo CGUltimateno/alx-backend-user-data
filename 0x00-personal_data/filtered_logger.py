@@ -75,7 +75,8 @@ def get_db() -> List[Tuple[str, str, str]]:
 
 def main():
     """
-        obtain a database connection using get_db and retrieve all rows in the users table
+        obtain a database connection using get_db
+        and retrieve all rows in the users table
         """
     db = get_db()
     cursor = db.cursor()
