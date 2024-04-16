@@ -4,7 +4,7 @@ Route module for the API
 """
 import os
 from api.v1.views import app_views
-from flask import jsonify, Flask
+from flask import jsonify, Flask, request, abort
 from flask_cors import (CORS, cross_origin)
 
 app = Flask(__name__)
@@ -35,3 +35,27 @@ def not_found(error):
 def forbidden(error):
     """ Error handler """
     return jsonify({"error": "Forbidden"}), 403
+
+
+@app.errorhandler(401)
+def unauthorized(error):
+    """ Error handler """
+    return jsonify({"error": "Unauthorized"}), 401
+
+
+@app.before_request
+def before_request():
+    """ Before request """
+    if auth is None:
+        return
+    if auth.require_auth(request.path, ['/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/']):
+        if auth.authorization_header(request) is None:
+            abort(401)
+        if auth.current_user(request) is None:
+            abort(403)
+
+
+if __name__ == "__main__":
+    host = os.getenv('HBNB_API_HOST', '0.0.0.0')
+    port = os.getenv('HBNB_API_PORT', 5000)
+    app.run(host=host, port=port, threaded=True)
