@@ -14,40 +14,41 @@ auth = None
 
 if os.getenv('AUTH_TYPE') == 'auth':
     from api.v1.auth.auth import Auth
-
     auth = Auth()
 elif os.getenv('AUTH_TYPE') == 'basic_auth':
     from api.v1.auth.basic_auth import BasicAuth
-
     auth = BasicAuth()
 
 
 @app.before_request
 def check_auth():
     """ Check auth """
-    if auth is None:
+    excluded_paths = ['/api/v1/status/', '/api/v1/unauthorized/',
+                      '/api/v1/forbidden/']
+    if not auth:
         return
-    if auth.require_auth(request.path, ['/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/']):
-        if auth.authorization_header(request) is None:
-            abort(401)
-        if auth.current_user(request) is None:
-            abort(403)
+    if not auth.require_auth(request.path, excluded_paths):
+        return
+    if not auth.authorization_header(request):
+        abort(401)
+    if not auth.current_user(request):
+        abort(403)
 
 
 @app.errorhandler(404)
-def not_found(error):
+def not_found(error) -> str:
     """ Error handler """
     return jsonify({"error": "Not found"}), 404
 
 
 @app.errorhandler(403)
-def forbidden(error):
+def forbidden(error) -> str:
     """ Error handler """
     return jsonify({"error": "Forbidden"}), 403
 
 
 @app.errorhandler(401)
-def unauthorized(error):
+def unauthorized(error) -> str:
     """ Error handler """
     return jsonify({"error": "Unauthorized"}), 401
 
