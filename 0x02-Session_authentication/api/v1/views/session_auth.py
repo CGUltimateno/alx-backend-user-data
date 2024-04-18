@@ -9,10 +9,10 @@ from flask import abort, jsonify, request
 from models.user import User
 from api.v1.auth.session_auth import SessionAuth
 
+
 @app_views.route('/auth_session/login',
                  methods=['POST'],
                  strict_slashes=False)
-
 def login() -> str:
     """ POST /api/v1/auth_session/login
     Return:
@@ -35,10 +35,10 @@ def login() -> str:
     response.set_cookie(os.getenv('SESSION_NAME'), session_id)
     return response
 
-@app_views.route('/auth_session/logout',
-                    methods=['DELETE'],
-                    strict_slashes=False)
 
+@app_views.route('/auth_session/logout',
+                 methods=['DELETE'],
+                 strict_slashes=False)
 def logout() -> str:
     """ DELETE /api/v1/auth_session/logout
     Return:
