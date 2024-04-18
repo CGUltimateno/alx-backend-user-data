@@ -9,21 +9,31 @@ from typing import List, TypeVar
 
 class Auth:
     """Auth class"""
+
+    def __init__(self):
+        """Constructor"""
+        pass
+
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
         """Require auth"""
-        if path is None or excluded_paths in ["", None]:
+        if not path:
             return True
-        if path[-1] != '/':
-            path += '/'
+        if not excluded_paths:
+            return True
+        path = path.rstrip('/')
         for excluded_path in excluded_paths:
-            if (search(sub(r"\*", ".*", excluded_path), path)):
+            excluded_path = excluded_path.rstrip('/')
+            if excluded_path.endswith('*'):
+                if path.startswith(excluded_path[:-1]):
+                    return False
+            elif path == excluded_path:
                 return False
         return True
 
     def authorization_header(self, request=None) -> str:
         """Authorization header"""
         if request is None or 'Authorization' not in request.headers:
-            return None
+            return
         return request.headers.get('Authorization')
 
     def current_user(self, request=None) -> TypeVar('User'):

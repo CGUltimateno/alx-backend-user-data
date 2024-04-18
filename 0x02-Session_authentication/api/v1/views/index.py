@@ -15,10 +15,10 @@ def status():
 @app_views.route('/stats', methods=['GET'], strict_slashes=False)
 def stats():
     """Return stats"""
-    from models.user import User
-    stats = {}
-    stats['users'] = User.count()
-    return jsonify(stats)
+    from models import storage
+    classes = {"amenities": "Amenity", "cities": "City", "places": "Place",
+               "reviews": "Review", "states": "State", "users": "User"}
+    return jsonify({key: storage.count(value) for key, value in classes.items()})
 
 
 @app_views.route('/unauthorized', methods=['GET'], strict_slashes=False)
