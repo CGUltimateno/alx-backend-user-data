@@ -14,7 +14,8 @@ class SessionAuth(Auth):
     user_id_by_session_id = {}
 
     def create_session(self, user_id: str = None) -> str:
-        """ Create a session ID
+        """ 
+        Create a session ID
         """
         if user_id is None:
             return None
@@ -25,16 +26,18 @@ class SessionAuth(Auth):
         return session_id
 
     def user_id_for_session_id(self, session_id: str = None) -> str:
-        """ Return a User ID based on a Session ID
+        """ 
+        Return a User ID based on a Session ID
         """
         if session_id is None:
             return None
         if not isinstance(session_id, str):
             return None
-        return self.user_id_by_session_id.get(session_id)
+        return self.user_id_by_session_id.get(session_id, None)
 
     def destroy_session(self, request=None):
-        """ Destroy a session
+        """ 
+        Destroy a session
         """
         if request is None:
             return False
@@ -48,7 +51,8 @@ class SessionAuth(Auth):
         return True
 
     def session_cookie(self, request=None):
-        """ Return a session cookie value from a request
+        """ 
+        Return a session cookie value from a request
         """
         if request is None:
             return None
