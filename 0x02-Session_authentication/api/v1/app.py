@@ -18,6 +18,9 @@ if os.getenv('AUTH_TYPE') == 'auth':
 elif os.getenv('AUTH_TYPE') == 'basic_auth':
     from api.v1.auth.basic_auth import BasicAuth
     auth = BasicAuth()
+elif os.getenv('AUTH_TYPE') == 'session_auth':
+    from api.v1.auth.session_auth import SecurityAuth
+    auth = SecurityAuth
 
 
 @app.before_request
@@ -31,10 +34,8 @@ def check_auth():
         return
     if not auth.authorization_header(request):
         abort(401)
-    user = auth.current_user(request)
-    if not user:
+    if not auth.current_user(request):
         abort(403)
-    request.current_user = user
 
 
 @app.errorhandler(404)
