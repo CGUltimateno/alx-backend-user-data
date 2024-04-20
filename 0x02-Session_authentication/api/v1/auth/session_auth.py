@@ -8,7 +8,8 @@ from .auth import Auth
 
 
 class SessionAuth(Auth):
-    """ SessionAuth class
+    """ 
+    SessionAuth class
     """
     user_id_by_session_id = {}
 
