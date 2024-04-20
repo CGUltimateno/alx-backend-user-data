@@ -6,6 +6,7 @@ import os
 import uuid
 from .auth import Auth
 from typing import TypeVar
+from models.user import User
 
 class SessionAuth(Auth):
     """ 
