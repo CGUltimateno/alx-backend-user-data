@@ -26,8 +26,9 @@ elif os.getenv('AUTH_TYPE') == 'session_auth':
 @app.before_request
 def check_auth():
     """ Check auth """
-    excluded_paths = ['/api/v1/status/', '/api/v1/unauthorized/',
-                      '/api/v1/forbidden/']
+    excluded_paths = ['/api/v1/status/',
+                       '/api/v1/unauthorized/', '/api/v1/forbidden/',
+                       '/api/v1/auth_session/login/']
     if not auth:
         return
     if not auth.require_auth(request.path, excluded_paths):
@@ -36,6 +37,9 @@ def check_auth():
         abort(401)
     if not auth.current_user(request):
         abort(403)
+    if (auth.authorization_header(request) and
+        not auth.session_cookie(request)):
+        abort(401)
 
 
 @app.errorhandler(404)
