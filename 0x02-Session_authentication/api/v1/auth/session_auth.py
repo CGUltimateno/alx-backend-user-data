@@ -5,7 +5,7 @@ Session authentication module
 import os
 import uuid
 from .auth import Auth
-
+from typing import TypeVar
 
 class SessionAuth(Auth):
     """ 
@@ -58,3 +58,14 @@ class SessionAuth(Auth):
             return None
         session_name = os.getenv('SESSION_NAME')
         return request.cookies.get(session_name)
+    
+    def current_user(self, request=None) -> TypeVar('User'):
+        """
+        User
+        """
+        if request:
+            cookie = self.session_cookie(request)
+            if cookie:
+                user_id = self.user_id_for_session_id(cookie)
+                return User.get(user_id)
+            
