@@ -8,6 +8,7 @@ from .auth import Auth
 from typing import TypeVar
 from models.user import User
 
+
 class SessionAuth(Auth):
     """ 
     SessionAuth class
@@ -15,7 +16,7 @@ class SessionAuth(Auth):
     user_id_by_session_id = {}
 
     def create_session(self, user_id: str = None) -> str:
-        """ 
+        """
         Create a session ID
         """
         if user_id is None:
@@ -27,7 +28,7 @@ class SessionAuth(Auth):
         return session_id
 
     def user_id_for_session_id(self, session_id: str = None) -> str:
-        """ 
+        """
         Return a User ID based on a Session ID
         """
         if session_id is None:
@@ -37,7 +38,7 @@ class SessionAuth(Auth):
         return self.user_id_by_session_id.get(session_id, None)
 
     def destroy_session(self, request=None):
-        """ 
+        """
         Destroy a session
         """
         if request is None:
@@ -52,14 +53,14 @@ class SessionAuth(Auth):
         return True
 
     def session_cookie(self, request=None):
-        """ 
+        """
         Return a session cookie value from a request
         """
         if request is None:
             return None
         session_name = os.getenv('SESSION_NAME')
         return request.cookies.get(session_name)
-    
+
     def current_user(self, request=None) -> TypeVar('User'):
         """
         User
@@ -69,4 +70,3 @@ class SessionAuth(Auth):
             if cookie:
                 user_id = self.user_id_for_session_id(cookie)
                 return User.get(user_id)
-            
