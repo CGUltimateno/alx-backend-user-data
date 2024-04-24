@@ -3,6 +3,7 @@
 Big Time Testing
 """
 import requests
+
 domain: str = "http://0.0.0.0:5000/%s"
 
 
@@ -16,7 +17,8 @@ def register_user(email: str, password: str) -> None:
     res = requests.post(url, data=payload)
     assert res.status_code == 200
     assert res.json() == expected
-    expected = {"messages": "email already registered"}
+
+    expected = {"message": "email already registered"}
     res = requests.post(url, data=payload)
     assert res.status_code == 400
     assert res.json() == expected
@@ -33,7 +35,7 @@ def log_in_wrong_password(email: str, password: str) -> None:
     assert res.status_code == 401
     assert res.json() == expected
     assert res.cookies == {}
-    assert res.cookies.get("session_id", None)
+    return res.cookies.get("session_id", None)
 
 
 def profile_unlogged() -> None:
@@ -59,7 +61,7 @@ def log_in(email: str, password: str) -> str:
     assert res.status_code == 200
     assert res.json() == expected
     assert session_id is not None
-    assert session_id
+    return session_id
 
 
 def profile_logged(session_id: str) -> None:
@@ -80,7 +82,20 @@ def log_out(session_id: str) -> None:
     res = requests.delete(url, cookies=dict(session_id=session_id))
     print(res.status_code)
     assert res.status_code == 200
-    assert res.json == {"message": "Bienvenue"}
+    assert res.json() == {"message": "Bienvenue"}
+
+
+def reset_password_token(email: str) -> str:
+    """
+    Reset Password Testing
+    """
+    url = domain % "reset_password"
+    res = requests.post(url, data={"email": email})
+    assert res.status_code == 200
+    reset_token = res.json().get("reset_token")
+    assert type(reset_token) == str
+    assert len(reset_token) > 0
+    return reset_token
 
 
 def update_password(email: str, reset_token: str, new_password: str) -> None:
@@ -90,8 +105,7 @@ def update_password(email: str, reset_token: str, new_password: str) -> None:
     url = domain % "reset_password"
     payload = [
         ("email", email),
-        ("reset_token", reset_token), ("new_password", new_password)
-    ]
+        ("reset_token", reset_token), ("new_password", new_password)]
     expected = {"email": "%s" % email, "message": "Password updated"}
     res = requests.put(url, data=payload)
     assert res.status_code == 200
