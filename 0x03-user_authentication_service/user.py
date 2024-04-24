@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Authentication User Class
+Define a User class for authentication
 """
-from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String
 
 
 Base = declarative_base()
@@ -11,7 +11,7 @@ Base = declarative_base()
 
 class User(Base):
     """
-    Authentication User Class
+    User authentication class
     """
     __tablename__ = 'users'
 
