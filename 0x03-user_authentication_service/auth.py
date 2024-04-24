@@ -7,12 +7,14 @@ from sqlalchemy.orm.exc import NoResultFound
 from typing import Union
 from db import DB, User
 
+
 def _generate_uuid() -> str:
     """
     Generates a UUID
     """
     from uuid import uuid4
     return str(uuid4())
+
 
 def _hash_password(password: str) -> bytes:
     """
@@ -27,7 +29,7 @@ class Auth:
 
     def __init__(self):
         self._db = DB()
-    
+
     def register_user(self, email: str, password: str) -> User:
         """
         Creates a new user
@@ -38,7 +40,7 @@ class Auth:
             return self._db.add_user(email, _hash_password(password))
         else:
             raise ValueError("User %s already exists" % email)
-    
+
     def valid_login(self, email: str, password: str) -> bool:
         """
         Validates login details
@@ -48,8 +50,8 @@ class Auth:
         except NoResultFound:
             return False
         return bcrypt.checkpw(password.encode(), user.hashed_password)
-    
-    def create_session(self, email: str)-> Union[str, None]:
+
+    def create_session(self, email: str) -> Union[str, None]:
         """
         creates a Session id for the user
         """
@@ -64,8 +66,8 @@ class Auth:
             except (NoResultFound, ValueError):
                 pass
         return session_id
-    
-    def get_user_from_session_id(self, session_id : str) -> Union[User, None]:
+
+    def get_user_from_session_id(self, session_id: str) -> Union[User, None]:
         """
         Gets User Session ID
         """
@@ -76,7 +78,7 @@ class Auth:
             except NoResultFound:
                 pass
         return None
-    
+
     def destroy_session(self, user_id: str) -> None:
         """
         Destroys User session
@@ -110,4 +112,3 @@ class Auth:
         except NoResultFound:
             raise ValueError
         return None
-        
