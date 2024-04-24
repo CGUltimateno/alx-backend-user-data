@@ -29,7 +29,7 @@ def unauthorized(error) -> str:
     return jsonify({"error": "Forbidden"}), 403
 
 
-@app.route('/')
+@app.route("/")
 def home() -> str:
     """ Main """
     return jsonify({"message": "Bienvenue"})
