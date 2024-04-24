@@ -26,7 +26,6 @@ class DB:
         Base.metadata.create_all(self._engine)
         self.__session = None
 
-
     @property
     def _session(self) -> Session:
         """Memoized session object
@@ -36,7 +35,6 @@ class DB:
             self.__session = DBSession()
         return self.__session
 
-
     def add_user(self, email: str, hashed_password: str) -> User:
         """
         Adds a new user to db
@@ -45,7 +43,6 @@ class DB:
         self._session.add(user)
         self._session.commit()
         return user
-    
 
     def find_user_by(self, **kwargs) -> User:
         """
@@ -58,8 +55,7 @@ class DB:
         if user is None:
             raise NoResultFound
         return user
-    
-    
+
     def update_user(self, user_id: int, **kwargs) -> None:
         """
         Updates current user
