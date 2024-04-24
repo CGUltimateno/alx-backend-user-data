@@ -13,7 +13,7 @@ def register_user(email: str, password: str) -> None:
     url = domain % "users"
     payload = [("email", email), ("password", password)]
     expected = {"email": email, "message": "user created"}
-    res = requests.post(user, data=payload)
+    res = requests.post(url, data=payload)
     assert res.status_code == 200
     assert res.json() == expected
     expected = {"messages": "email already registered"}
