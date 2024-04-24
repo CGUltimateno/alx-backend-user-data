@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-User Auth App
+User Authentication Application
 """
 from flask import Flask
 from flask import (
@@ -94,10 +94,10 @@ def get_reset_password_token():
     """
     email = request.form.get("email")
     try:
-        res_token = AUTH.get_reset_password_token(email)
+        reset_token = AUTH.get_reset_password_token(email)
     except ValueError:
         abort(403)
-    return jsonify({"email": "%s" % email, "reset_token": "%s" % res_token})
+    return jsonify({"email": "%s" % email, "reset_token": "%s" % reset_token})
 
 
 @app.route("/reset_password", methods=["PUT"], strict_slashes=False)
@@ -106,15 +106,16 @@ def update_password():
     Update Pass
     """
     email = request.form.get("email")
-    res_token = request.form.get("res_token")
-    new_pass = request.form.get("new_password")
+    reset_token = request.form.get("reset_token")
+    new_password = request.form.get("new_password")
     try:
-        AUTH.update_password(res_token, new_pass)
+        AUTH.update_password(reset_token, new_password)
         return jsonify({"email": "%s" % email, "message": "Password updated"})
     except Exception:
         pass
     abort(403)
 
-    
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     app.run(host="0.0.0.0", port="5000")
+    

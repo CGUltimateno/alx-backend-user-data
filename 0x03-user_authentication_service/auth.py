@@ -11,7 +11,7 @@ def _generate_uuid() -> str:
     """
     Generates a UUID
     """
-    from UUID import uuid4
+    from uuid import uuid4
     return str(uuid4())
 
 def _hash_password(password: str) -> bytes:
@@ -33,9 +33,9 @@ class Auth:
         Creates a new user
         """
         try:
-            user = self.__db.find_user_by(email=email)
+            user = self._db.find_user_by(email=email)
         except NoResultFound:
-            return self.__db.add_user(email, _hash_password(password))
+            return self._db.add_user(email, _hash_password(password))
         else:
             raise ValueError("User %s already exists" % email)
     
@@ -44,23 +44,23 @@ class Auth:
         Validates login details
         """
         try:
-            user = self.__db.find_user_by(email=email)
+            user = self._db.find_user_by(email=email)
         except NoResultFound:
             return False
         return bcrypt.checkpw(password.encode(), user.hashed_password)
     
     def create_session(self, email: str)-> Union[str, None]:
         """
-        Session id for the user
+        creates a Session id for the user
         """
         session_id = _generate_uuid()
         try:
-            user = self.__db.find_user_by(email=email)
+            user = self._db.find_user_by(email=email)
         except NoResultFound:
             pass
         else:
             try:
-                self.__db.update_user(user.id, session_id=session_id)
+                self._db.update_user(user.id, session_id=session_id)
             except (NoResultFound, ValueError):
                 pass
         return session_id
@@ -71,7 +71,7 @@ class Auth:
         """
         if session_id is not None:
             try:
-                user = self.__db.find_user_by(session_id=session_id)
+                user = self._db.find_user_by(session_id=session_id)
                 return user
             except NoResultFound:
                 pass
@@ -88,12 +88,12 @@ class Auth:
         Generates a reset password token
         """
         try:
-            user = self.__db.find_user_by(email=email)
+            user = self._db.find_user_by(email=email)
         except NoResultFound:
             raise ValueError
         res_token = _generate_uuid()
         try:
-            self._db.update_user(user_id, res_token=res_token)
+            self._db.update_user(user.id, res_token=res_token)
         except (NoResultFound, ValueError):
             raise ValueError
         return res_token
@@ -103,10 +103,11 @@ class Auth:
         Updates current user's password
         """
         try:
-            user = self.__db.find_user_by(reset_token=reset_token)
+            user = self._db.find_user_by(reset_token=reset_token)
             password = _hash_password(password)
             self._db.update_user(
                 user.id, hashed_password=password, reset_token=None)
         except NoResultFound:
             raise ValueError
         return None
+        
